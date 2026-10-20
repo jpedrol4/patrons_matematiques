@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Patrons · Institut Escola de Batea</title>
+<style>
+  :root{
+    --bg:#fff8ea; --paper:#ffffff; --ink:#243044; --muted:#667085;
+    --brand:#2d6a4f; --brand2:#40916c; --accent:#f4a261; --danger:#d9534f;
+    --line:#e7dfd0; --shadow:0 12px 32px rgba(44,62,80,.12);
+    --radius:22px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; color:var(--ink); background:
+      radial-gradient(circle at 10% 10%,#ffe8b6 0 8%,transparent 9%),
+      radial-gradient(circle at 90% 0%,#cdebdc 0 10%,transparent 11%),
+      var(--bg);
+    font-family: ui-rounded, "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+  }
+  button,select,input{font:inherit}
+  button{touch-action:manipulation}
+  .app{max-width:1180px;margin:auto;padding:18px}
+  header{
+    display:flex; gap:14px; align-items:center; justify-content:space-between;
+    margin-bottom:14px; flex-wrap:wrap;
+  }
+  .titleBox{display:flex;gap:12px;align-items:center}
+  .logo{
+    width:58px;height:58px;border-radius:18px;display:grid;place-items:center;
+    background:var(--brand);color:white;font-size:30px;box-shadow:var(--shadow)
+  }
+  h1{font-size:clamp(1.55rem,3vw,2.4rem);margin:0;line-height:1}
+  .subtitle{color:var(--muted);margin-top:5px;font-size:.98rem}
+  .topActions{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{
+    border:0;border-radius:15px;padding:12px 16px;background:#eef4ef;color:var(--ink);
+    cursor:pointer;font-weight:800;min-height:48px
+  }
+  .btn:hover{filter:brightness(.98);transform:translateY(-1px)}
+  .btn.primary{background:var(--brand);color:#fff}
+  .btn.accent{background:var(--accent);color:#3d2a0e}
+  .btn.danger{background:#fde5e3;color:#9c2c2c}
+  .panel{
+    background:rgba(255,255,255,.94);border:2px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:18px
+  }
+  .setup{
+    display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-bottom:16px
+  }
+  .controls{display:grid;grid-template-columns:repeat(2,minmax(160px,1fr));gap:12px}
+  label{font-size:.9rem;font-weight:900;color:var(--muted)}
+  select{
+    margin-top:6px;width:100%;border:2px solid #d9dedb;border-radius:14px;
+    padding:12px;background:#fff;color:var(--ink);font-weight:800;min-height:48px
+  }
+  .miniHelp{line-height:1.45}
+  .miniHelp strong{color:var(--brand)}
+  .scorebar{
+    display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-bottom:16px
+  }
+  .team{
+    border-radius:18px;padding:13px 15px;background:#f7faf8;border:2px solid #dfe9e3;
+    display:flex;justify-content:space-between;align-items:center;gap:8px
+  }
+  .team.active{outline:4px solid #f4c06a;background:#fffaf0}
+  .teamName{font-size:1.08rem;font-weight:1000}
+  .score{font-size:1.8rem;font-weight:1000}
+  .round{font-weight:900;color:var(--muted);text-align:center}
+  .game{min-height:520px;display:flex;flex-direction:column;justify-content:center}
+  .instruction{text-align:center;font-size:clamp(1.15rem,2.8vw,1.75rem);font-weight:1000;margin:0 0 18px}
+  .pattern{
+    display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;
+    min-height:132px;padding:18px;border-radius:22px;background:#fbfbf8;border:3px dashed #d7d8cf
+  }
+  .tile{
+    width:clamp(62px,9vw,92px);height:clamp(62px,9vw,92px);
+    border-radius:20px;border:3px solid rgba(0,0,0,.1);display:grid;place-items:center;
+    font-size:clamp(2rem,5vw,3rem);font-weight:1000;box-shadow:0 7px 0 rgba(0,0,0,.07)
+  }
+  .tile.blank{
+    background:#fff!important;color:#a2a8b0;border:4px dashed #b8bec6;box-shadow:none
+  }
+  .answers{
+    display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:22px
+  }
+  .answer{
+    border:0;background:none;padding:4px;border-radius:24px;cursor:pointer
+  }
+  .answer:focus-visible{outline:5px solid #111}
+  .answer .tile{transition:.15s transform}
+  .answer:hover .tile{transform:translateY(-4px) scale(1.03)}
+  .feedback{
+    min-height:64px;margin-top:18px;text-align:center;font-size:1.2rem;font-weight:1000;
+    display:grid;place-items:center
+  }
+  .feedback.ok{color:#1f7a45}.feedback.no{color:#ae2f2f}
+  .actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+  .builder{
+    margin-top:18px;padding:14px;border-radius:18px;background:#f7f4ec;display:none
+  }
+  .builder.show{display:block}
+  .builderRow{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap}
+  .builderSlots{
+    min-height:78px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+    margin:12px 0;padding:10px;border-radius:16px;background:white;border:2px dashed #c9c6bc
+  }
+  .smallTile{width:54px;height:54px;border-radius:14px;font-size:1.65rem;cursor:pointer}
+  dialog{
+    border:0;border-radius:24px;max-width:650px;width:calc(100% - 30px);
+    box-shadow:0 25px 80px rgba(0,0,0,.3);padding:0
+  }
+  dialog::backdrop{background:rgba(30,35,40,.45)}
+  .modal{padding:22px}
+  .modal h2{margin-top:0}
+  .rules{line-height:1.55}
+  .settingsGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .footer{
+    text-align:center;color:var(--muted);font-size:.82rem;margin-top:12px
+  }
+  .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+  .confetti i{position:absolute;top:-20px;font-style:normal;animation:fall 1.1s linear forwards}
+  @keyframes fall{to{transform:translateY(105vh) rotate(520deg);opacity:.1}}
+  @media(max-width:760px){
+    .setup{grid-template-columns:1fr}.controls{grid-template-columns:1fr 1fr}
+    .scorebar{grid-template-columns:1fr 1fr}.round{grid-column:1/-1;grid-row:1}
+    .game{min-height:470px}.settingsGrid{grid-template-columns:1fr}
+  }
+  @media(max-width:470px){.controls{grid-template-columns:1fr}.app{padding:10px}.panel{padding:13px}}
+  @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="titleBox">
+      <div class="logo" aria-hidden="true">◈</div>
+      <div>
+        <h1>Patrons</h1>
+        <div class="subtitle">Institut Escola de Batea · Cicle inicial</div>
+      </div>
+    </div>
+    <div class="topActions">
+      <button class="btn" id="helpBtn">❔ Com es juga?</button>
+      <button class="btn" id="soundBtn" aria-pressed="true">🔊 So</button>
+      <button class="btn danger" id="resetBtn">↻ Reinicia</button>
+    </div>
+  </header>
+
+  <section class="setup">
+    <div class="panel">
+      <div class="controls">
+        <div>
+          <label for="mode">ACTIVITAT</label>
+          <select id="mode">
+            <option value="continue">Continua el patró</option>
+            <option value="missing">Quina peça falta?</option>
+            <option value="build">Construeix un patró</option>
+          </select>
+        </div>
+        <div>
+          <label for="kind">TIPUS DE PATRÓ</label>
+          <select id="kind">
+            <option value="AB">AB</option>
+            <option value="AAB">AAB</option>
+            <option value="ABB">ABB</option>
+            <option value="ABC">ABC</option>
+            <option value="ABBC">ABBC</option>
+            <option value="random">Sorpresa ✨</option>
+          </select>
+        </div>
+        <div>
+          <label for="theme">PECES</label>
+          <select id="theme">
+            <option value="shapes">Formes i colors</option>
+            <option value="animals">Animals</option>
+            <option value="nature">Natura</option>
+            <option value="school">Escola</option>
+          </select>
+        </div>
+        <div>
+          <label for="play">MODE DE JOC</label>
+          <select id="play">
+            <option value="teams">2 equips</option>
+            <option value="solo">Classe / individual</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="panel miniHelp">
+      <strong>Objectiu:</strong> observar què es repeteix, explicar la regla i anticipar la peça següent.
+      <br><br>
+      💡 <b>Pregunta docent:</b> “Quina és la part que es repeteix? Com ho saps?”
+    </div>
+  </section>
+
+  <section class="scorebar" id="scorebar">
+    <div class="team active" id="teamA"><span class="teamName">🟢 Equip Verd</span><span class="score" id="scoreA">0</span></div>
+    <div class="round" id="roundText">Ronda 1</div>
+    <div class="team" id="teamB"><span class="teamName">🟠 Equip Taronja</span><span class="score" id="scoreB">0</span></div>
+  </section>
+
+  <main class="panel game">
+    <p class="instruction" id="instruction">Quina peça continua el patró?</p>
+    <div class="pattern" id="pattern" aria-live="polite"></div>
+    <div class="answers" id="answers"></div>
+
+    <div class="builder" id="builder">
+      <div class="builderRow" id="palette"></div>
+      <div class="builderSlots" id="builderSlots" aria-label="El teu patró"></div>
+      <div class="actions">
+        <button class="btn" id="undoBtn">← Desfés</button>
+        <button class="btn primary" id="checkBuildBtn">✓ Comprova</button>
+      </div>
+    </div>
+
+    <div class="feedback" id="feedback" aria-live="assertive"></div>
+    <div class="actions">
+      <button class="btn accent" id="explainBtn">💬 Mostra la regla</button>
+      <button class="btn primary" id="nextBtn">Següent ▶</button>
+    </div>
+  </main>
+
+  <div class="footer">Aplicació educativa local · Sense comptes, anuncis ni recollida de dades</div>
+</div>
+
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+
+<dialog id="helpDialog">
+  <div class="modal">
+    <h2>Com es juga?</h2>
+    <div class="rules">
+      <p><b>Continua el patró:</b> tria la peça que ve després.</p>
+      <p><b>Quina peça falta?:</b> troba la peça amagada dins la seqüència.</p>
+      <p><b>Construeix:</b> crea dues repeticions completes del patró indicat.</p>
+      <p><b>2 equips:</b> cada resposta correcta suma 1 punt i canvia el torn. Una resposta incorrecta no resta punts.</p>
+      <p>Abans de prémer, demaneu a l’alumnat que digui en veu alta la <b>unitat de repetició</b>: “vermell-blau”, “gat-gat-gos”, etc.</p>
+    </div>
+    <button class="btn primary" onclick="helpDialog.close()">Entesos!</button>
+  </div>
+</dialog>
+
+<script>
+(() => {
+  const PATTERNS = {
+    AB:[0,1], AAB:[0,0,1], ABB:[0,1,1], ABC:[0,1,2], ABBC:[0,1,1,2]
+  };
+  const THEMES = {
+    shapes:[
+      {s:"●",bg:"#ef5350",fg:"#fff",name:"cercle vermell"},
+      {s:"■",bg:"#42a5f5",fg:"#fff",name:"quadrat blau"},
+      {s:"▲",bg:"#fdd835",fg:"#3a3414",name:"triangle groc"},
+      {s:"★",bg:"#66bb6a",fg:"#fff",name:"estrella verda"}
+    ],
+    animals:[
+      {s:"🐱",bg:"#fff1c7",fg:"#222",name:"gat"},
+      {s:"🐶",bg:"#d7ecff",fg:"#222",name:"gos"},
+      {s:"🐸",bg:"#dff5dc",fg:"#222",name:"granota"},
+      {s:"🐞",bg:"#ffe0e0",fg:"#222",name:"marieta"}
+    ],
+    nature:[
+      {s:"🌻",bg:"#fff3b7",fg:"#222",name:"gira-sol"},
+      {s:"🍃",bg:"#d8f1df",fg:"#222",name:"fulla"},
+      {s:"☁️",bg:"#dceeff",fg:"#222",name:"núvol"},
+      {s:"🍎",bg:"#ffe0dc",fg:"#222",name:"poma"}
+    ],
+    school:[
+      {s:"✏️",bg:"#fff0bb",fg:"#222",name:"llapis"},
+      {s:"📘",bg:"#dce8ff",fg:"#222",name:"llibre"},
+      {s:"🎒",bg:"#ffe2e2",fg:"#222",name:"motxilla"},
+      {s:"📏",bg:"#e2f2df",fg:"#222",name:"regle"}
+    ]
+  };
+
+  const $ = id => document.getElementById(id);
+  const els = Object.fromEntries(["mode","kind","theme","play","pattern","answers","instruction","feedback",
+    "nextBtn","explainBtn","scoreA","scoreB","teamA","teamB","roundText","scorebar","builder","palette",
+    "builderSlots","undoBtn","checkBuildBtn","soundBtn","helpBtn","resetBtn","helpDialog","confetti"].map(x=>[x,$(x)]));
+
+  let state = {score:[0,0], team:0, round:1, sound:true, correct:null, seq:[], unit:[], missing:-1, locked:false, build:[]};
+
+  function pickKind(){
+    if(els.kind.value !== "random") return els.kind.value;
+    const ks = Object.keys(PATTERNS);
+    return ks[Math.floor(Math.random()*ks.length)];
+  }
+  function items(){ return THEMES[els.theme.value] }
+  function tile(item, cls=""){
+    return `<div class="tile ${cls}" style="background:${item.bg};color:${item.fg}" aria-label="${item.name}">${item.s}</div>`;
+  }
+  function sound(ok){
+    if(!state.sound) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    const ctx = new AC(), o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type="sine"; o.frequency.value = ok ? 660 : 210;
+    g.gain.setValueAtTime(.12,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.23);
+    o.start(); o.stop(ctx.currentTime+.24);
+  }
+  function celebrate(){
+    const chars=["★","●","▲","◆","✦"];
+    for(let i=0;i<18;i++){
+      const c=document.createElement("i"); c.textContent=chars[i%chars.length];
+      c.style.left=Math.random()*100+"vw"; c.style.fontSize=(18+Math.random()*18)+"px";
+      c.style.animationDelay=(Math.random()*.18)+"s";
+      els.confetti.appendChild(c); setTimeout(()=>c.remove(),1500);
+    }
+  }
+  function updateScore(){
+    els.scoreA.textContent=state.score[0]; els.scoreB.textContent=state.score[1];
+    els.teamA.classList.toggle("active",state.team===0);
+    els.teamB.classList.toggle("active",state.team===1);
+    els.roundText.textContent=`Ronda ${state.round}`;
+    const teams=els.play.value==="teams";
+    els.scorebar.style.display=teams?"grid":"none";
+  }
+  function makeUnit(kind){
+    const needed=Math.max(...PATTERNS[kind])+1, pool=[...items()];
+    for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+    return pool.slice(0,needed);
+  }
+  function generate(){
+    state.locked=false; state.build=[]; els.feedback.className="feedback"; els.feedback.textContent="";
+    els.answers.innerHTML=""; els.pattern.innerHTML=""; els.builder.classList.remove("show");
+    const kind=pickKind(), map=PATTERNS[kind], unit=makeUnit(kind);
+    state.unit=unit; state.kindNow=kind;
+    const mode=els.mode.value;
+    if(mode==="build"){ renderBuild(kind,map,unit); return; }
+
+    const repeat = mode==="missing" ? 3 : 3;
+    const idxs=[];
+    for(let r=0;r<repeat;r++) idxs.push(...map);
+    state.seq=idxs.map(i=>unit[i]);
+
+    if(mode==="continue"){
+      state.correct=unit[map[idxs.length % map.length]];
+      els.instruction.textContent="Quina peça continua el patró?";
+      els.pattern.innerHTML=state.seq.map(x=>tile(x)).join("") + `<div class="tile blank">?</div>`;
+    }else{
+      state.missing=Math.max(1,Math.min(state.seq.length-2,Math.floor(Math.random()*state.seq.length)));
+      state.correct=state.seq[state.missing];
+      els.instruction.textContent="Quina peça falta?";
+      els.pattern.innerHTML=state.seq.map((x,i)=>i===state.missing?`<div class="tile blank">?</div>`:tile(x)).join("");
+    }
+    renderAnswers(unit);
+  }
+  function renderAnswers(unit){
+    const set=[...unit];
+    const extras=items().filter(x=>!set.includes(x));
+    if(extras.length && set.length<4) set.push(extras[Math.floor(Math.random()*extras.length)]);
+    for(let i=set.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[set[i],set[j]]=[set[j],set[i]]}
+    els.answers.innerHTML="";
+    set.forEach(item=>{
+      const b=document.createElement("button"); b.className="answer"; b.setAttribute("aria-label",item.name);
+      b.innerHTML=tile(item); b.onclick=()=>answer(item,b); els.answers.appendChild(b);
+    });
+  }
+  function answer(item,button){
+    if(state.locked) return;
+    const ok=item===state.correct;
+    if(ok){
+      state.locked=true; sound(true); celebrate();
+      els.feedback.className="feedback ok"; els.feedback.textContent="Molt bé! Has trobat la regla! ⭐";
+      if(els.play.value==="teams") state.score[state.team]++;
+      button.querySelector(".tile").style.outline="6px solid #36a269";
+      updateScore();
+    }else{
+      sound(false); els.feedback.className="feedback no";
+      els.feedback.textContent="Gairebé! Mira què es repeteix i prova una altra peça.";
+      button.querySelector(".tile").style.opacity=".38";
+    }
+  }
+  function renderBuild(kind,map,unit){
+    els.instruction.textContent=`Construeix dues vegades el patró ${kind}`;
+    els.pattern.innerHTML=map.map(i=>tile(unit[i])).join("") + `<span style="font-weight:1000;color:#7c8590;margin-left:8px">← model</span>`;
+    els.builder.classList.add("show"); els.builderSlots.innerHTML="";
+    els.palette.innerHTML="";
+    unit.forEach((it,i)=>{
+      const b=document.createElement("button"); b.className="answer"; b.setAttribute("aria-label",it.name);
+      b.innerHTML=tile(it,"smallTile"); b.onclick=()=>{state.build.push(i); drawBuild(unit)}; els.palette.appendChild(b);
+    });
+  }
+  function drawBuild(unit){
+    els.builderSlots.innerHTML=state.build.map(i=>tile(unit[i],"smallTile")).join("");
+  }
+  function checkBuild(){
+    if(els.mode.value!=="build" || state.locked) return;
+    const target=[...PATTERNS[state.kindNow],...PATTERNS[state.kindNow]];
+    const ok=target.length===state.build.length && target.every((x,i)=>x===state.build[i]);
+    if(ok){
+      state.locked=true; sound(true); celebrate(); els.feedback.className="feedback ok";
+      els.feedback.textContent="Fantàstic! Has construït dues repeticions completes! ⭐";
+      if(els.play.value==="teams") state.score[state.team]++;
+      updateScore();
+    }else{
+      sound(false); els.feedback.className="feedback no";
+      els.feedback.textContent=state.build.length<target.length ? `Encara falten ${target.length-state.build.length} peces.` : "Revisa l’ordre. On torna a començar el patró?";
+    }
+  }
+  function next(){
+    if(els.play.value==="teams"){state.team=1-state.team;if(state.team===0)state.round++} else state.round++;
+    updateScore(); generate();
+  }
+  function explain(){
+    const names=PATTERNS[state.kindNow].map(i=>state.unit[i].name);
+    els.feedback.className="feedback";
+    els.feedback.textContent=`La unitat que es repeteix és: ${names.join(" – ")}.`;
+  }
+  function reset(){
+    state.score=[0,0];state.team=0;state.round=1;updateScore();generate();
+  }
+
+  ["mode","kind","theme"].forEach(k=>els[k].addEventListener("change",generate));
+  els.play.addEventListener("change",()=>{updateScore();generate()});
+  els.nextBtn.onclick=next; els.explainBtn.onclick=explain;
+  els.undoBtn.onclick=()=>{state.build.pop();drawBuild(state.unit)};
+  els.checkBuildBtn.onclick=checkBuild;
+  els.soundBtn.onclick=()=>{state.sound=!state.sound;els.soundBtn.textContent=state.sound?"🔊 So":"🔇 So";els.soundBtn.setAttribute("aria-pressed",String(state.sound))};
+  els.helpBtn.onclick=()=>els.helpDialog.showModal();
+  els.resetBtn.onclick=reset;
+  document.addEventListener("keydown",e=>{
+    if(e.key==="ArrowRight") next();
+    if(e.key==="Escape" && els.helpDialog.open) els.helpDialog.close();
+  });
+
+  updateScore(); generate();
+})();
+</script>
+</body>
+</html>
